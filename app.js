@@ -1,28 +1,24 @@
 import express from 'express';
-import songsController from './controllers/playlistController.js'
-import bodyParser from 'body-parser'
+import router from './routes/playlistRouter.js'
+import errorController from './controllers/errorController.js';
+import CustomError from "./utils/CustomError.js"
 
 const PORT = 3000
 const app = express();
-app.use(bodyParser.json());
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 
-// Add a song to Playlist
-app.post('/playlist', songsController.addSongtoPlaylist)
+app.use('/playlist', router)
 
-// Get a song from Playlist
-app.get('/playlist', songsController.getPlaylist)
-
-//  Get Most Played song from Playlist
-app.get('/playlist/mostplayed', songsController.mostPlayed)
-
-//  Play Song from Playlist
-app.get('/playlist/:songIdx', songsController.playSong)
-
-
+app.use('*', (req, _, next) =>{
+    const err = new CustomError(`Cant't find ${req.originalUrl} on the server!`, 404)
+    next(err)
+})
 
 // Middleware Error
-app.use(songsController.emptyHandler)
+app.use(errorController)
 
 
 app.listen(PORT, () => console.log(`Server is running on PORT http://localhost:${PORT}`))
