@@ -2,27 +2,21 @@ import * as service from "../service/Playlist.js";
 
 const addSongtoPlaylist = (req, res, next) => {
     try {
-        for (const key in req.body){
-            if (!req.body[key]){
-                throw new Error("There is empty data...")
-            }
-        }
         const { title, artist, url } = req.body;
-
-        const artists = service.splitArtists(artist)
-        const song = service.addSong(title, artists, url)
-        service.addSongtoPlaylist(song)
+        
+        const song = service.addSong(title, artist, url)
+        const result = service.addSongtoPlaylist(song)
 
         return res.status(201).json({
             message: 'Song added successfully...',
-            data: song
+            data: result
         });
     } catch (error) {
         next(error)
     }
 }
 
-const getPlaylist = (req, res, next) =>{
+const getPlaylist = (_, res, next) =>{
     try {
         const playlist = service.getPlaylist()
 
@@ -35,26 +29,23 @@ const getPlaylist = (req, res, next) =>{
     }
 }
 
-const playSong = (req, res) => {
+const playSong = (req, res, next) => {
     try{
-        const index = req.params.songIdx
-        const song = service.playSong(parseInt(index))
+        const index = req.params.idx
+        const play = service.playSong(parseInt(index))
 
         return res.status(200).json({
             message: 'Song retrieved successfully...',
-            data: song,
+            data: play,
         });
     }catch(error){
-        return res.status(404).json({
-            message: error.message
-        })
+        next(error)
     }
 }
 
-const mostPlayed = (req, res, next) => {
+const mostPlayed = (_, res, next) => {
     try {
         const mostPlayedPlaylist = service.getMostPlayed()
-        console.log(mostPlayedPlaylist)
         return res.status(200).json({
             message:"Playlist retrieved successfully",
             data:mostPlayedPlaylist
@@ -65,14 +56,10 @@ const mostPlayed = (req, res, next) => {
 }
 
 
-// Middleware Error
-const emptyHandler = ((err, req, res, next) =>{
-    res.status(500).json({
-        message: err.message
-    })
-})
 
-export default {
-    addSongtoPlaylist, getPlaylist, 
-    emptyHandler, playSong, mostPlayed
+export { 
+    addSongtoPlaylist, 
+    getPlaylist,
+    playSong,
+    mostPlayed
 }
