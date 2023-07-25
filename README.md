@@ -2,18 +2,32 @@
 
 This repository serves simple Playlist API using `Express.js`
 
+## Get Started
+
+> Instalation
+
+```poweshell
+npm install
+```
+
+> Run
+
+```poweshell
+npm run start
+```
+
 ## API Endpoint
 
 |Method|Path|Description|
 |---|---|---|
 |`GET`|/playlist| Get a song from Playlist|
-|`GET`|/playlist/mostplayed| Get Most Played song from Playlist|
-|`GET`|/playlist/1|Play Song from Playlist|
 |`POST`|/playlist|Add a song to Playlist|
+|`GET`|/playlist/mostplayed| Get Most Played song from Playlist|
+|`GET`|/playlist/play/0|Play Song from Playlist|
 
 ### JSON Body
 
-`GET` /playlist
+`POST` /playlist
 
 ```json
 {
