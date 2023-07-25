@@ -1,57 +1,61 @@
 import Songs  from "../models/Songs.js";
 import Playlists  from "../models/Playlist.js"
+import CustomError from "../utils/CustomError.js"
+import splitString  from "../utils/SplitString.js"
 
+const playlists = new Playlists()
 
-const Playlist = new Playlists()
 
 function addSong(title, artists, url){
-    Playlist.songs.forEach(song => {
+    const playlist = playlists.getSongs()
+
+    if (!title || !artists || !url){
+        throw new CustomError("There is empty data...", 400)
+    }
+
+    playlist.forEach(song => {
         if (title === song.title){
-            throw new Error ('Title already exists...')
+            throw new CustomError('Title already exists...', 400)
         }
     })
-    const Song = new Songs(title, artists, url)
+    const artist = splitString(artists)
+    const Song = new Songs(title, artist, url)
     return Song
 }
 
 function addSongtoPlaylist(song){
-    Playlist.songs.push(song)
+    playlists.addSong(song)
 }
 
 function getPlaylist(){
-    const playlist = Playlist.songs
+    const playlist = playlists.getSongs()
+
     if (playlist.length < 1){
-        throw new Error('The playlist is still empty...')
+        throw new CustomError('The playlist is still empty...', 400)
     }
     return playlist
 }
 
-function getMostPlayed(){
-    const playlist = Playlist.songs
-    if (playlist.length < 1){
-        throw new Error('The playlist is still empty...')
-    }
-    return playlist.sort((a, b) => b.totalPlay - a.totalPlay)
-}
-
 function playSong(index){
-    if (Playlist.songs[index]){
-        Playlist.songs[index].totalPlay++
-        return Playlist.songs[index]
+    const playedSong = playlists.playSong(index)
+    
+    if(!playedSong){
+        throw new CustomError('Song Not Found...', 400)
     }
-    throw new Error('Song Not Found...')
+    playedSong.totalPlay++
+    return playedSong
 }
 
-function splitArtists(artist){
-    const trimArtists = artist.trim().split(",")
-    const artists = trimArtists.map(artist => artist.trim())
-    return artists
+function getMostPlayed(){
+    const playlist = playlists.getMostPlayed()
+    if (playlist.length < 1){
+        throw new CustomError('The playlist is still empty...', 400)
+    }
+    return playlist
 }
-
-
 
 export { 
-    addSong, addSongtoPlaylist, getPlaylist, 
-    splitArtists, playSong, getMostPlayed
+    addSong, addSongtoPlaylist, 
+    getPlaylist, playSong, getMostPlayed
 }
 
